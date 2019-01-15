@@ -658,8 +658,7 @@ private T abs (T) (T x)
     For example, turning `byte(-1)` into `long` or `ulong` gives different
     result.
     This functions allows to get the same exact binary representation of an
-    integral type into another. If the representation is truncating, it is
-    just a cast. If it is widening, it zero extends `val`.
+    integral type into another by using D's builtin rules.
 
     Params:
         To      = Type to convert to
@@ -670,25 +669,24 @@ private T abs (T) (T x)
     Returns:
         Binary representation of `val` typed as `To`
 
+    See_Also:
+        https://dlang.org/spec/type.html#usual-arithmetic-conversions
+
 *******************************************************************************/
 
 private To reinterpretInteger (To, From) (From val)
 {
-    static if (From.sizeof >= To.sizeof)
-        return cast(To) val;
+    // TODO: Use To(0xFF...) when the syntax is available (D2 only)
+    static if (To.sizeof == 8)
+        return (val & cast(To)0xFFFF_FFFF_FFFF_FFFF);
+    else static if (To.sizeof == 4)
+        return (val & cast(To)0xFFFF_FFFF);
+    else static if (To.sizeof == 2)
+        return (val & cast(To)0xFFFF);
+    else static if (To.sizeof == 1)
+        return (val & cast(To)0xFF);
     else
-    {
-        static struct Reinterpreter
-        {
-            version (LittleEndian) From value;
-            // 0 padding
-            ubyte[To.sizeof - From.sizeof] pad;
-            version (BigEndian) From value;
-        }
-
-        Reinterpreter r = { value: val };
-        return *(cast(To*) &r.value);
-    }
+        static assert(0, "Type of unsupported size: " ~ To.stringof);
 }
 
 
