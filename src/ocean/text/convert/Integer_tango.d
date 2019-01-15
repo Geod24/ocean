@@ -262,7 +262,7 @@ Const!(T)[] formatter(T, N) (T[] dst, N i_, char type, char pre, int width)
         { 16, "0X", upper},
     ];
 
-    ubyte index;
+    Const!(Info)* info = &formats[0];
     int len = cast(int) dst.length;
 
     if (len)
@@ -274,13 +274,13 @@ Const!(T)[] formatter(T, N) (T[] dst, N i_, char type, char pre, int width)
             case 'g':
             case 'G':
                 if (i < 0)
-                    index = 1;
+                    info = &formats[1];
                 else
                     if (pre is ' ')
-                        index = 2;
+                        info = &formats[2];
                     else
                         if (pre is '+')
-                            index = 3;
+                            info = &formats[3];
                 goto case;
             case 'u':
             case 'U':
@@ -289,27 +289,26 @@ Const!(T)[] formatter(T, N) (T[] dst, N i_, char type, char pre, int width)
 
             case 'b':
             case 'B':
-                index = 4;
+                info = &formats[4];
                 break;
 
             case 'o':
             case 'O':
-                index = 5;
+                info = &formats[5];
                 break;
 
             case 'x':
-                index = 6;
+                info = &formats[6];
                 break;
 
             case 'X':
-                index = 7;
+                info = &formats[7];
                 break;
 
             default:
                 return cast(T[])"{unknown format '"~cast(T)type~"'}";
         }
 
-        auto info = &formats[index];
         auto numbers = info.numbers;
         auto radix = info.radix;
 
@@ -318,7 +317,7 @@ Const!(T)[] formatter(T, N) (T[] dst, N i_, char type, char pre, int width)
 
 
         // Base 10 formatting
-        if (index <= 3 && index)
+        if (info.radix == 10 && info.prefix)
         {
             verify((i >= 0 && radix > 0) || (i < 0 && radix < 0));
 
