@@ -37,16 +37,16 @@ import ocean.meta.types.Qualifiers : istring;
 public void verify ( bool ok, lazy istring msg = "",
     istring file = __FILE__, int line = __LINE__ )
 {
-    static SanityException static_exc;
-
-    SanityException exc;
+    static SanityException exc;
 
     if (__ctfe)
+    {
+        assert(ok, msg);
+        return
+    }
+
+    if (exc is null)
         exc = new SanityException("");
-    else if (static_exc is null)
-        exc = static_exc = new SanityException("");
-    else
-        exc = static_exc;
 
     if (!ok)
     {
