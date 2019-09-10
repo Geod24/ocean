@@ -93,8 +93,6 @@ unittest
 public template ReusableExceptionImplementation()
 {
     import ocean.transition;
-    import ocean.core.Buffer;
-    static import ocean.core.array.Mutation;
     static import ocean.text.convert.Formatter;
     static import ocean.text.convert.Integer_tango;
 
@@ -107,7 +105,7 @@ public template ReusableExceptionImplementation()
 
     ***************************************************************************/
 
-    protected Buffer!(char) reused_msg;
+    protected char[] reused_msg;
 
     /***************************************************************************
 
@@ -142,7 +140,9 @@ public template ReusableExceptionImplementation()
     public typeof (this) set ( cstring msg, istring file = __FILE__,
         long line = __LINE__ )
     {
-        ocean.core.array.Mutation.copy(this.reused_msg, msg);
+        this.reused_msg.length = msg.length;
+        this.reused_msg.assumeSafeAppend();
+        this.reused_msg[] = msg[];
         this.msg  = null;
         this.file = file;
         this.line = line;
@@ -206,7 +206,7 @@ public template ReusableExceptionImplementation()
 
     public typeof (this) append ( cstring msg )
     {
-        ocean.core.array.Mutation.append(this.reused_msg, msg);
+        this.reused_msg ~= msg;
         return this;
     }
 
@@ -227,18 +227,7 @@ public template ReusableExceptionImplementation()
 
     public typeof (this) append ( long num, bool hex = false )
     {
-        char[long.max.stringof.length + 1] buff;
-        if (hex)
-        {
-            ocean.core.array.Mutation.append(this.reused_msg, "0x"[]);
-            ocean.core.array.Mutation.append(
-                this.reused_msg,
-                ocean.text.convert.Integer_tango.format(buff, num, "X"));
-        }
-        else
-            ocean.core.array.Mutation.append(
-                this.reused_msg,
-                ocean.text.convert.Integer_tango.format(buff, num));
+        ocean.text.convert.Formatter.sformat(this.reused_msg, hex ? "0x{X}" : "{}", num);
         return this;
     }
 

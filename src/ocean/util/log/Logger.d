@@ -10,7 +10,8 @@
     object and initialize it on construction:
 
     ---
-    module superapp.main;
+    // Triggers a dub bug...
+    modu_le superapp.main;
 
     import ocean.transition;
     import ocean.util.log.Logger;
@@ -60,7 +61,6 @@ import ocean.transition;
 import ocean.core.Verify;
 import ocean.core.ExceptionDefinitions;
 import ocean.io.model.IConduit;
-import ocean.sys.Common;
 import ocean.text.convert.Formatter;
 import ocean.time.Clock;
 import ocean.util.log.Appender;
@@ -307,14 +307,12 @@ public struct Log
 
         Initialize the behaviour of a basic logging hierarchy.
 
-        Adds a StreamAppender to the root node, and sets the activity level
-        to be everything enabled.
-
     ***************************************************************************/
 
-    public static void config (OutputStream stream, bool flush = true)
+    public static void defaultConfig ()
     {
-        This.root.add(new AppendStream(stream, flush));
+        import ocean.util.log.AppendConsole;
+        This.root.add(new AppendConsole());
     }
 
     /***************************************************************************
@@ -784,7 +782,7 @@ public final class Logger : ILogger
 
     ***************************************************************************/
 
-    public Logger append (Level level, lazy cstring exp)
+    public Logger append (Level level, lazy cstring exp) @trusted
     {
         if (host_.context.enabled (level_, level))
         {
@@ -875,6 +873,7 @@ public final class Logger : ILogger
     ***************************************************************************/
 
     public void format (Args...) (Level level, cstring fmt, Args args)
+        @safe
     {
         static if (Args.length == 0)
             this.append(level, fmt);

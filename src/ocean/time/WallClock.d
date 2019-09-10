@@ -17,11 +17,10 @@
 
 module ocean.time.WallClock;
 
-public  import ocean.time.Time;
-
+import core.sys.posix.sys.time;
+import core.sys.posix.time;
+public import ocean.time.Time;
 import ocean.time.Clock;
-
-import ocean.sys.Common;
 
 /******************************************************************************
 
@@ -55,18 +54,6 @@ struct WallClock
         localtime_r (&tv.tv_sec, &t);
         tv.tv_sec = timegm (&t);
         return Clock.convert (tv);
-    }
-
-    /***************************************************************************
-
-        Returns
-            the timezone relative to GMT. The value is negative when west of GMT
-
-    ***************************************************************************/
-
-    static TimeSpan zone ()
-    {
-        return TimeSpan.fromSeconds(-timezone);
     }
 
     /***************************************************************************

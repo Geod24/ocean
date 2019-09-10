@@ -23,7 +23,6 @@
 
 module ocean.util.log.model.ILogger;
 
-import ocean.stdc.string;
 import ocean.transition;
 
 version (unittest)
@@ -31,6 +30,9 @@ version (unittest)
     import ocean.core.Test;
 }
 
+// https://github.com/dlang/druntime/pull/2789
+/// Compare two strings ignoring case, up to n characters
+private extern(C) int strncasecmp(scope const char* s1, scope const char* s2, size_t n);
 
 /// Ditto
 interface ILogger

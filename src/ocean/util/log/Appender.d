@@ -223,50 +223,6 @@ public class AppendNull : Appender
     }
 }
 
-
-/// Append to a configured OutputStream
-public class AppendStream : Appender
-{
-    private Mask            mask_;
-    private bool            flush_;
-    private OutputStream    stream_;
-
-    ///Create with the given stream and layout
-    this (OutputStream stream, bool flush = false, Appender.Layout how = null)
-    {
-        verify(stream !is null);
-
-        this.mask_ = register (name);
-        this.stream_ = stream;
-        this.flush_ = flush;
-        this.layout(how);
-    }
-
-    /// Return the fingerprint for this class
-    final override Mask mask ()
-    {
-        return this.mask_;
-    }
-
-    /// Return the name of this class
-    override istring name ()
-    {
-        return this.classinfo.name;
-    }
-
-    /// Append an event to the output.
-    final override void append (LogEvent event)
-    {
-        static immutable istring Eol = "\n";
-
-        this.layout.format(event, (cstring content) { this.stream_.write(content); });
-        this.stream_.write(Eol);
-        if (this.flush_)
-            this.stream_.flush;
-    }
-}
-
-
 /*******************************************************************************
 
     A simple layout comprised only of time(ms), level, name, and message
