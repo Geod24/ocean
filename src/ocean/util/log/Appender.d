@@ -61,6 +61,36 @@ public class Appender
     public interface Layout
     {
         void format (LogEvent event, scope void delegate(cstring) dg);
+
+        /// Returns: A colorized version of a LogLevel
+        protected static string coloredName (ILogger.Level lvl)
+        {
+            switch (lvl)
+            {
+            // Cyan
+            case ILogger.Level.Trace:
+                return "\u001b[36mTrace\u001b[0m";
+            // Green
+            case ILogger.Level.Info:
+                return "\u001b[32mInfo\u001b[0m";
+            // Yellow
+            case ILogger.Level.Warn:
+                return "\u001b[33mWarn\u001b[0m";
+            // Magenta
+            case ILogger.Level.Error:
+                return "\u001b[35mError\u001b[0m";
+            // Red
+            case ILogger.Level.Fatal:
+                return "\u001b[31mFatal\u001b[0m";
+
+            // The following two should never be printed,
+            // so use red and make them noticeable
+            case ILogger.Level.None:
+                return "\u001b[31mNone\u001b[0m";
+            default:
+                return "\u001b[31mUnknown\u001b[0m";
+            }
+        }
     }
 
     /***************************************************************************
@@ -240,8 +270,8 @@ public class LayoutTimer : Appender.Layout
 
     public override void format (LogEvent event, scope FormatterSink dg)
     {
-        sformat(dg, "{} {} [{}] {}- {}", event.span.millis(), event.levelName,
-            event.name, event.host.label, event);
+        sformat(dg, "{} {} [{}] {}- {}", event.span.millis(),
+            coloredName(event.level), event.name, event.host.label, event);
     }
 }
 
