@@ -84,7 +84,6 @@ import ocean.core.Verify;
 import ocean.meta.traits.Basic;
 import ocean.meta.types.Typedef;
 import ocean.meta.types.Arrays;
-import ocean.meta.codegen.Identifier;
 
 /*******************************************************************************
 
@@ -481,9 +480,9 @@ private void handle (T) (T v, FormatInfo f, scope FormatterSink sf, scope ElemSi
         foreach (idx, ref m; v.tupleof)
         {
             static if (idx == 0)
-                sf("{ " ~ identifier!(T.tupleof[idx]) ~ ": ");
+                sf("{ " ~ __traits(identifier, T.tupleof[idx]) ~ ": ");
             else
-                sf(", " ~ identifier!(T.tupleof[idx]) ~ ": ");
+                sf(", " ~ __traits(identifier, T.tupleof[idx]) ~ ": ");
 
             // A bit ugly but it makes string much more readable
             handle(m, f, sf, se);
